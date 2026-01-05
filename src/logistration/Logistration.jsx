@@ -5,40 +5,28 @@ import { getConfig } from '@edx/frontend-platform';
 import { sendPageEvent, sendTrackEvent } from '@edx/frontend-platform/analytics';
 import { getAuthService } from '@edx/frontend-platform/auth';
 import { useIntl } from '@edx/frontend-platform/i18n';
-import {
-  Icon,
-  Tab,
-  Tabs,
-} from '@openedx/paragon';
+import { PluginSlot } from '@openedx/frontend-plugin-framework';
+import { Icon, Tab, Tabs } from '@openedx/paragon';
 import { ChevronLeft } from '@openedx/paragon/icons';
 import PropTypes from 'prop-types';
 import { Navigate, useNavigate } from 'react-router-dom';
 
 import BaseContainer from '../base-container';
 import { clearThirdPartyAuthContextErrorMessage } from '../common-components/data/actions';
-import {
-  tpaProvidersSelector,
-} from '../common-components/data/selectors';
+import { tpaProvidersSelector } from '../common-components/data/selectors';
 import messages from '../common-components/messages';
 import { LOGIN_PAGE, REGISTER_PAGE } from '../data/constants';
-import {
-  getTpaHint, getTpaProvider, updatePathWithQueryParams,
-} from '../data/utils';
+import { getTpaHint, getTpaProvider, updatePathWithQueryParams } from '../data/utils';
 import { backupLoginForm } from '../login/data/actions';
 import LoginComponentSlot from '../plugin-slots/LoginComponentSlot';
 import { RegistrationPage } from '../register';
 import { backupRegistrationForm } from '../register/data/actions';
 
-const Logistration = ({
-  selectedPage,
-}) => {
+const Logistration = ({ selectedPage }) => {
   const tpaHint = getTpaHint();
   const tpaProviders = useSelector(tpaProvidersSelector);
   const dispatch = useDispatch();
-  const {
-    providers,
-    secondaryProviders,
-  } = tpaProviders;
+  const { providers, secondaryProviders } = tpaProviders;
   const { formatMessage } = useIntl();
   const [institutionLogin, setInstitutionLogin] = useState(false);
   const [key, setKey] = useState('');
@@ -49,8 +37,7 @@ const Logistration = ({
   useEffect(() => {
     const authService = getAuthService();
     if (authService) {
-      authService.getCsrfTokenService()
-        .getCsrfToken(getConfig().LMS_BASE_URL);
+      authService.getCsrfTokenService().getCsrfToken(getConfig().LMS_BASE_URL);
     }
   });
 
@@ -75,7 +62,9 @@ const Logistration = ({
     if (tabKey === currentTab) {
       return;
     }
-    sendTrackEvent(`edx.bi.${tabKey.replace('/', '')}_form.toggled`, { category: 'user-engagement' });
+    sendTrackEvent(`edx.bi.${tabKey.replace('/', '')}_form.toggled`, {
+      category: 'user-engagement',
+    });
     dispatch(clearThirdPartyAuthContextErrorMessage());
     if (tabKey === LOGIN_PAGE) {
       dispatch(backupRegistrationForm());
@@ -102,10 +91,10 @@ const Logistration = ({
   };
 
   return (
-    <BaseContainer>
-      <div>
-        {disablePublicAccountCreation
-          ? (
+    <PluginSlot id="org.openedx.frontend.authn.logistration" pluginProps={{ selectedPage }}>
+      <BaseContainer>
+        <div>
+          {disablePublicAccountCreation ? (
             <>
               {institutionLogin && (
                 <Tabs defaultActiveKey="" id="controlled-tab" onSelect={handleInstitutionLogin}>
@@ -122,52 +111,64 @@ const Logistration = ({
                 />
               </div>
             </>
-          )
-          : (
+          ) : (
             <div>
-              {institutionLogin
-                ? (
-                  <Tabs defaultActiveKey="" id="controlled-tab" onSelect={handleInstitutionLogin}>
-                    <Tab title={tabTitle} eventKey={selectedPage === LOGIN_PAGE ? LOGIN_PAGE : REGISTER_PAGE} />
-                  </Tabs>
-                )
-                : (!isValidTpaHint() && !hideRegistrationLink && (
+              {institutionLogin ? (
+                <Tabs defaultActiveKey="" id="controlled-tab" onSelect={handleInstitutionLogin}>
+                  <Tab
+                    title={tabTitle}
+                    eventKey={selectedPage === LOGIN_PAGE ? LOGIN_PAGE : REGISTER_PAGE}
+                  />
+                </Tabs>
+              ) : (
+                !isValidTpaHint() &&
+                !hideRegistrationLink && (
                   <Tabs
                     defaultActiveKey={selectedPage}
                     id="controlled-tab"
                     onSelect={(tabKey) => handleOnSelect(tabKey, selectedPage)}
                   >
-                    <Tab title={formatMessage(messages['logistration.register'])} eventKey={REGISTER_PAGE} />
-                    <Tab title={formatMessage(messages['logistration.sign.in'])} eventKey={LOGIN_PAGE} />
+                    <Tab
+                      title={formatMessage(messages['logistration.register'])}
+                      eventKey={REGISTER_PAGE}
+                    />
+                    <Tab
+                      title={formatMessage(messages['logistration.sign.in'])}
+                      eventKey={LOGIN_PAGE}
+                    />
                   </Tabs>
-                ))}
-              {key && (
-                <Navigate to={updatePathWithQueryParams(key)} replace />
+                )
               )}
+              {key && <Navigate to={updatePathWithQueryParams(key)} replace />}
               <div id="main-content" className="main-content">
                 {!institutionLogin && !isValidTpaHint() && hideRegistrationLink && (
                   <h3 className="mb-4.5">
-                    {formatMessage(messages[selectedPage === LOGIN_PAGE ? 'logistration.sign.in' : 'logistration.register'])}
+                    {formatMessage(
+                      messages[
+                        selectedPage === LOGIN_PAGE
+                          ? 'logistration.sign.in'
+                          : 'logistration.register'
+                      ]
+                    )}
                   </h3>
                 )}
-                {selectedPage === LOGIN_PAGE
-                  ? (
-                    <LoginComponentSlot
-                      institutionLogin={institutionLogin}
-                      handleInstitutionLogin={handleInstitutionLogin}
-                    />
-                  )
-                  : (
-                    <RegistrationPage
-                      institutionLogin={institutionLogin}
-                      handleInstitutionLogin={handleInstitutionLogin}
-                    />
-                  )}
+                {selectedPage === LOGIN_PAGE ? (
+                  <LoginComponentSlot
+                    institutionLogin={institutionLogin}
+                    handleInstitutionLogin={handleInstitutionLogin}
+                  />
+                ) : (
+                  <RegistrationPage
+                    institutionLogin={institutionLogin}
+                    handleInstitutionLogin={handleInstitutionLogin}
+                  />
+                )}
               </div>
             </div>
           )}
-      </div>
-    </BaseContainer>
+        </div>
+      </BaseContainer>
+    </PluginSlot>
   );
 };
 

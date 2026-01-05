@@ -17,7 +17,8 @@
     "snapshot": "fedx-scripts jest --updateSnapshot",
     "start": "fedx-scripts webpack-dev-server --progress",
     "dev": "PUBLIC_PATH=/authn/ MFE_CONFIG_API_URL='http://localhost:8000/api/mfe_config/v1' fedx-scripts webpack-dev-server --progress --host apps.local.openedx.io",
-    "test": "fedx-scripts jest --coverage --passWithNoTests"
+    "test": "fedx-scripts jest --coverage --passWithNoTests",
+    "wdev": "cross-env PUBLIC_PATH=/authn/ MFE_CONFIG_API_URL='http://localhost:8000/api/mfe_config/v1' fedx-scripts webpack-dev-server --progress --host apps.local.openedx.io --config webpack.dev-extract-css.config.js"
   },
   "author": "edX",
   "license": "AGPL-3.0",
@@ -45,6 +46,7 @@
     "algoliasearch-helper": "^3.26.0",
     "classnames": "2.5.1",
     "core-js": "3.43.0",
+    "cross-env": "^10.1.0",
     "fastest-levenshtein": "1.0.16",
     "form-urlencoded": "6.1.6",
     "prop-types": "15.8.1",
