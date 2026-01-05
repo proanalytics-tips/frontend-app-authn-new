@@ -1,3 +1,5 @@
+# Ignore env config file
+env.config.jsx
 .DS_Store
 .eslintcache
 .idea
