@@ -29,7 +29,7 @@ import Logistration from './logistration/Logistration';
 import { ProgressiveProfiling } from './progressive-profiling';
 import { RecommendationsPage } from './recommendations';
 import { RegistrationPage } from './register';
-import { ResetPasswordPage } from './reset-password';
+// import { ResetPasswordPage } from './reset-password';
 
 import './index.scss';
 
@@ -79,7 +79,14 @@ const MainApp = () => (
           </UnAuthOnlyRoute>
         }
       />
-      <Route path={PASSWORD_RESET_CONFIRM} element={<ResetPasswordPage />} />
+      <Route
+        path={PASSWORD_RESET_CONFIRM}
+        element={
+          <UnAuthOnlyRoute>
+            <Logistration selectedPage={PASSWORD_RESET_CONFIRM} />
+          </UnAuthOnlyRoute>
+        }
+      />
       <Route path={AUTHN_PROGRESSIVE_PROFILING} element={<ProgressiveProfiling />} />
       <Route path={RECOMMENDATIONS} element={<RecommendationsPage />} />
       <Route path={PAGE_NOT_FOUND} element={<NotFoundPage />} />
